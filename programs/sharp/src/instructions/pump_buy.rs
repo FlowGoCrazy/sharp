@@ -1,12 +1,12 @@
 use anchor_lang::prelude::*;
 
-use crate::pump::pump_idl;
-use crate::pump::pump_idl::program::Pump;
+use crate::external::pump;
+use crate::external::pump::program::Pump;
 
 pub fn pump_buy(ctx: Context<PumpBuy>, amount: u64, max_sol_cost: u64) -> Result<()> {
     let cpi_ctx = CpiContext::new(
         ctx.accounts.pump_program.to_account_info(),
-        pump_idl::cpi::accounts::Buy {
+        pump::cpi::accounts::Buy {
             global: ctx.accounts.global.to_account_info(),
             fee_recipient: ctx.accounts.fee_recipient.to_account_info(),
             mint: ctx.accounts.mint.to_account_info(),
@@ -21,14 +21,14 @@ pub fn pump_buy(ctx: Context<PumpBuy>, amount: u64, max_sol_cost: u64) -> Result
             program: ctx.accounts.pump_program.to_account_info(),
         },
     );
-    pump_idl::cpi::buy(cpi_ctx, amount, max_sol_cost)?;
+    pump::cpi::buy(cpi_ctx, amount, max_sol_cost)?;
 
     Ok(())
 }
 
 #[derive(Accounts)]
 pub struct PumpBuy<'info> {
-    pub global: Account<'info, pump_idl::accounts::Global>,
+    pub global: Account<'info, pump::accounts::Global>,
     #[account(mut)]
     /// CHECK: This is safe.
     pub fee_recipient: AccountInfo<'info>,
@@ -36,7 +36,7 @@ pub struct PumpBuy<'info> {
     pub mint: AccountInfo<'info>,
     #[account(mut)]
     /// CHECK: This is safe.
-    pub bonding_curve: Account<'info, pump_idl::accounts::BondingCurve>,
+    pub bonding_curve: Account<'info, pump::accounts::BondingCurve>,
     #[account(mut)]
     /// CHECK: This is safe.
     pub associated_bonding_curve: AccountInfo<'info>,
