@@ -27,15 +27,15 @@ upgradeable = false
 
 [[test.genesis]]
 address = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"
-program = "programs/pump.so"
+program = "programs_external/pump.so"
 
 [[test.genesis]]
 address = "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"
-program = "programs/raydium.so"
+program = "programs_external/raydium.so"
 
 [[test.genesis]]
 address = "srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX"
-program = "programs/openbook.so"
+program = "programs_external/openbook.so"
 
 [test.validator]
 bind_address = "0.0.0.0"
