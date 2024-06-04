@@ -23,6 +23,8 @@ startup_wait = 5000
 shutdown_wait = 2000
 upgradeable = false
 
+# clone all invoked programs
+
 [[test.genesis]]
 address = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"
 program = "programs/pump.so"
@@ -41,7 +43,7 @@ url = "https://mainnet.helius-rpc.com/?api-key=4d612394-b5d0-46a2-b702-700ca9e1b
 ledger = ".anchor/test-ledger"
 rpc_port = 8899
 
-# clone all necessary accounts to test swap
+# clone all necessary accounts to test raydium swaps
 
 # amm
 [[test.validator.clone]]
@@ -90,3 +92,33 @@ address = "4CknBkuczy4tUss7aEoCqV27Bt7oGMem8RtR1dvjkfpz"
 # out mint
 [[test.validator.clone]]
 address = "nLKhEUbWB3xx3Rr9DJDWGBEUraJY3mUyhgy3axYDqF3"
+
+# clone all necessary accounts to test pump swaps
+
+# global
+[[test.validator.clone]]
+address = "4wTV1YmiEkRvAtNtsSGPtUrqRYQMe5SKy2uB4Jjaxnjf"
+
+# fee recipient
+[[test.validator.clone]]
+address = "CebN5WGQ4jvEPvsVU4EoHEpgzq1VV7AbicfhtW4xC9iM"
+
+# mint
+[[test.validator.clone]]
+address = "8UrsCAR7XpE8asvAtrErSCRjszcEhHVGLsdtzspgesmB"
+
+# bonding curve
+[[test.validator.clone]]
+address = "EDDz8NdF1rsQNysSjCtNbJpmTXPgBmvvrumptf3bqZw4"
+
+# associated bonding curve
+[[test.validator.clone]]
+address = "CkJFiP1t266KjsrnjY65M1PX3MpG5koia4tyoFNiVi5M"
+
+# # system program
+# [[test.validator.clone]]
+# address = "11111111111111111111111111111111"
+
+# # token program
+# [[test.validator.clone]]
+# address = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"

@@ -3,6 +3,8 @@ import {
     createInitializeAccountInstruction,
     createCloseAccountInstruction,
     TOKEN_PROGRAM_ID,
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    getAssociatedTokenAddress,
 } from '@solana/spl-token';
 import * as anchor from '@coral-xyz/anchor';
 import { Program } from '@coral-xyz/anchor';
@@ -61,6 +63,7 @@ describe('sharp', async () => {
             outMint,
         );
 
+        /* swap 1 SOL for tokens */
         const swapIx = await PROGRAM.methods
             .raydiumSwapBaseIn(new anchor.BN(1_000_000_000), new anchor.BN(100_000))
             .accounts({
@@ -191,6 +194,7 @@ describe('sharp', async () => {
         const inMintBalanceRaw = await PROVIDER.connection.getTokenAccountBalance(userTokenSource);
         const inMintBalance = parseInt(inMintBalanceRaw.value.amount);
 
+        /* swap all tokens for a minimum of 0.995 SOL */
         const swapIx = await PROGRAM.methods
             .raydiumSwapBaseOut(new anchor.BN(inMintBalance), new anchor.BN(995_000_000))
             .accounts({
@@ -270,6 +274,161 @@ describe('sharp', async () => {
         let postTokenBalance = 0;
         for (const tokenBalance of txData.meta.postTokenBalances) {
             if (tokenBalance.mint == inMint.toBase58() && tokenBalance.owner == USER.toBase58()) {
+                postTokenBalance = tokenBalance.uiTokenAmount.uiAmount;
+                break;
+            }
+        }
+        const tokensSpent = preTokenBalance - postTokenBalance;
+
+        console.log(`spent ${tokensSpent} tokens and received ${solReceived} SOL`);
+    });
+
+    it('can buy on pump fun', async () => {
+        const mint = new anchor.web3.PublicKey('8UrsCAR7XpE8asvAtrErSCRjszcEhHVGLsdtzspgesmB');
+
+        const associatedUser = await getAssociatedTokenAddress(mint, USER);
+
+        const createAssociatedUserIx = await createAssociatedTokenAccountInstruction(
+            USER,
+            associatedUser,
+            USER,
+            mint,
+        );
+
+        const pumpBuyIx = await PROGRAM.methods
+            .pumpBuy(new anchor.BN(10_000_000_000_000), new anchor.BN(1_000_000_000))
+            .accounts({
+                global: '4wTV1YmiEkRvAtNtsSGPtUrqRYQMe5SKy2uB4Jjaxnjf',
+                feeRecipient: 'CebN5WGQ4jvEPvsVU4EoHEpgzq1VV7AbicfhtW4xC9iM',
+                mint: mint,
+                bondingCurve: 'EDDz8NdF1rsQNysSjCtNbJpmTXPgBmvvrumptf3bqZw4',
+                associatedBondingCurve: 'CkJFiP1t266KjsrnjY65M1PX3MpG5koia4tyoFNiVi5M',
+                associatedUser: associatedUser,
+                user: USER,
+                systemProgram: '11111111111111111111111111111111',
+                tokenProgram: TOKEN_PROGRAM_ID,
+                eventAuthority: 'Ce6TQqeHC9p8KetsN6JsjHK7UTZk7nasjjnr7XxXp9F1',
+            })
+            .instruction();
+
+        const tx = new anchor.web3.Transaction();
+        tx.add(setCuLimitIx);
+        tx.add(createAssociatedUserIx);
+        tx.add(pumpBuyIx);
+
+        const { blockhash, lastValidBlockHeight } = await PROVIDER.connection.getLatestBlockhash();
+        tx.recentBlockhash = blockhash;
+        tx.lastValidBlockHeight = lastValidBlockHeight;
+        tx.feePayer = USER;
+
+        const signedTx = await userWallet.signTransaction(tx);
+        const signature = await anchor
+            .getProvider()
+            .connection.sendRawTransaction(signedTx.serialize(), {
+                skipPreflight: true,
+            });
+
+        await anchor.getProvider().connection.confirmTransaction(signature, 'confirmed');
+        const txData = await anchor
+            .getProvider()
+            .connection.getParsedTransaction(signature, 'confirmed');
+
+        if (txData.meta.err != null) {
+            console.log(JSON.stringify(txData.meta.logMessages, null, 2));
+            console.log(txData.meta.err);
+            throw txData.meta.err;
+        }
+
+        /* calculate sol spent */
+        const preSolBalance = txData.meta.preBalances[0];
+        const postSolBalance = txData.meta.postBalances[0];
+        const solSpent = (preSolBalance - postSolBalance) / 1_000_000_000;
+
+        /* calculate tokens received */
+        let preTokenBalance = 0;
+        for (const tokenBalance of txData.meta.preTokenBalances) {
+            if (tokenBalance.mint == mint.toBase58() && tokenBalance.owner == USER.toBase58()) {
+                preTokenBalance = tokenBalance.uiTokenAmount.uiAmount;
+                break;
+            }
+        }
+        let postTokenBalance = 0;
+        for (const tokenBalance of txData.meta.postTokenBalances) {
+            if (tokenBalance.mint == mint.toBase58() && tokenBalance.owner == USER.toBase58()) {
+                postTokenBalance = tokenBalance.uiTokenAmount.uiAmount;
+                break;
+            }
+        }
+        const tokensReceived = postTokenBalance - preTokenBalance;
+
+        console.log(`spent ${solSpent} SOL and received ${tokensReceived} tokens`);
+    });
+
+    it('can sell on pump fun', async () => {
+        const mint = new anchor.web3.PublicKey('8UrsCAR7XpE8asvAtrErSCRjszcEhHVGLsdtzspgesmB');
+
+        const associatedUser = await getAssociatedTokenAddress(mint, USER);
+
+        const pumpBuyIx = await PROGRAM.methods
+            .pumpSell(new anchor.BN(10_000_000_000_000), new anchor.BN(250_000_000))
+            .accounts({
+                global: '4wTV1YmiEkRvAtNtsSGPtUrqRYQMe5SKy2uB4Jjaxnjf',
+                feeRecipient: 'CebN5WGQ4jvEPvsVU4EoHEpgzq1VV7AbicfhtW4xC9iM',
+                mint: mint,
+                bondingCurve: 'EDDz8NdF1rsQNysSjCtNbJpmTXPgBmvvrumptf3bqZw4',
+                associatedBondingCurve: 'CkJFiP1t266KjsrnjY65M1PX3MpG5koia4tyoFNiVi5M',
+                associatedUser: associatedUser,
+                user: USER,
+                systemProgram: '11111111111111111111111111111111',
+                tokenProgram: TOKEN_PROGRAM_ID,
+                associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+                eventAuthority: 'Ce6TQqeHC9p8KetsN6JsjHK7UTZk7nasjjnr7XxXp9F1',
+            })
+            .instruction();
+
+        const tx = new anchor.web3.Transaction();
+        tx.add(setCuLimitIx);
+        tx.add(pumpBuyIx);
+
+        const { blockhash, lastValidBlockHeight } = await PROVIDER.connection.getLatestBlockhash();
+        tx.recentBlockhash = blockhash;
+        tx.lastValidBlockHeight = lastValidBlockHeight;
+        tx.feePayer = USER;
+
+        const signedTx = await userWallet.signTransaction(tx);
+        const signature = await anchor
+            .getProvider()
+            .connection.sendRawTransaction(signedTx.serialize(), {
+                skipPreflight: true,
+            });
+
+        await anchor.getProvider().connection.confirmTransaction(signature, 'confirmed');
+        const txData = await anchor
+            .getProvider()
+            .connection.getParsedTransaction(signature, 'confirmed');
+
+        if (txData.meta.err != null) {
+            console.log(JSON.stringify(txData.meta.logMessages, null, 2));
+            console.log(txData.meta.err);
+            throw txData.meta.err;
+        }
+
+        /* calculate sol received */
+        const preSolBalance = txData.meta.preBalances[0];
+        const postSolBalance = txData.meta.postBalances[0];
+        const solReceived = (postSolBalance - preSolBalance) / 1_000_000_000;
+
+        /* calculate tokens spent */
+        let preTokenBalance = 0;
+        for (const tokenBalance of txData.meta.preTokenBalances) {
+            if (tokenBalance.mint == mint.toBase58() && tokenBalance.owner == USER.toBase58()) {
+                preTokenBalance = tokenBalance.uiTokenAmount.uiAmount;
+                break;
+            }
+        }
+        let postTokenBalance = 0;
+        for (const tokenBalance of txData.meta.postTokenBalances) {
+            if (tokenBalance.mint == mint.toBase58() && tokenBalance.owner == USER.toBase58()) {
                 postTokenBalance = tokenBalance.uiTokenAmount.uiAmount;
                 break;
             }
