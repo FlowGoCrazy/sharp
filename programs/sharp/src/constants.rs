@@ -1,6 +1,5 @@
-// use anchor_lang::prelude::*;
+use anchor_lang::prelude::*;
 
-// use anchor_lang::solana_program::pubkey;
+use anchor_lang::solana_program::pubkey;
 
-// pub const RAYDIUM_AMM_PROGRAM: Pubkey = pubkey!("675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8");
-// pub const SERUM_DEX_PROGRAM: Pubkey = pubkey!("srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX");
+pub const RAYDIUM_AMM_AUTHORITY: Pubkey = pubkey!("5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1");

@@ -3,10 +3,10 @@ use solana_program::{instruction::Instruction, program::invoke};
 
 use crate::instructions::raydium_swap::RaydiumSwap;
 
-pub fn raydium_swap_base_in(
+pub fn raydium_swap_base_out(
     ctx: Context<RaydiumSwap>,
-    amount_in: u64,
-    minimum_amount_out: u64,
+    max_amount_in: u64,
+    amount_out: u64,
 ) -> Result<()> {
     let amm_program = ctx.accounts.amm_program.to_account_info();
     let amm = ctx.accounts.amm.to_account_info();
@@ -28,10 +28,10 @@ pub fn raydium_swap_base_in(
     let user_source_owner = ctx.accounts.user_source_owner.to_account_info();
     let token_program = ctx.accounts.token_program.to_account_info();
 
-    let instruction_index: u8 = 9;
-    let data = SwapBaseInAmounts {
-        amount_in,
-        minimum_amount_out,
+    let instruction_index: u8 = 11;
+    let data = SwapBaseOutAmounts {
+        max_amount_in,
+        amount_out,
     };
 
     let instruction = Instruction {
@@ -96,7 +96,7 @@ pub fn raydium_swap_base_in(
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Debug, Clone)]
-pub struct SwapBaseInAmounts {
-    pub amount_in: u64,
-    pub minimum_amount_out: u64,
+pub struct SwapBaseOutAmounts {
+    pub max_amount_in: u64,
+    pub amount_out: u64,
 }

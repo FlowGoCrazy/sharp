@@ -31,8 +31,62 @@ program = "programs/pump.so"
 address = "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"
 program = "programs/raydium.so"
 
+[[test.genesis]]
+address = "srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX"
+program = "programs/openbook.so"
+
 [test.validator]
 bind_address = "0.0.0.0"
 url = "https://mainnet.helius-rpc.com/?api-key=4d612394-b5d0-46a2-b702-700ca9e1b0d5"
 ledger = ".anchor/test-ledger"
 rpc_port = 8899
+
+# clone all necessary accounts to test swap
+
+# amm
+[[test.validator.clone]]
+address = "GCCNLvpp6wVPWUaXRguXPCv84g2utWYXXfiqcy6y5zg4"
+
+# amm open orders
+[[test.validator.clone]]
+address = "EsXYKKYuBMxSRgV6d6ExRZeJB9iZiPs4JGamPdsSRMZn"
+
+# amm target orders
+[[test.validator.clone]]
+address = "FFms2iYnwKfXAuTqmP12z7uqD4fRHr4E9bxUtt5hY7yo"
+
+# amm coin vault
+[[test.validator.clone]]
+address = "5UrrK6d4TxnMj5ejTxAcabJfSyn58de4eaYuTnibPgV3"
+
+# amm pc vault
+[[test.validator.clone]]
+address = "4YHFVkhULspUPGc8MBsvfaBhXLEzfnoBU6rVyhT2qmSk"
+
+# market
+[[test.validator.clone]]
+address = "65VnQdkc78GctbqYpXaMPmaTMfUUedp6jp43z5ZLftmC"
+
+# market bids
+[[test.validator.clone]]
+address = "6ksp1MZFoUUAzBJMbW1VcSiLG3iXdxzUXHrB9ZYjetYp"
+
+# market asks
+[[test.validator.clone]]
+address = "2y3fT7VkhhwC5FD4qpP3RbEbCYRC7wv4mwupDf4FsKKk"
+
+# market event queue
+[[test.validator.clone]]
+address = "BDNPVv8bM5ew7aXWGXNJ4C9HmENJfbA5ZAnbHi7Htssj"
+
+# market coin vault
+[[test.validator.clone]]
+address = "67wM6L6KHn4Nu72AKQNjWV854sGmgPVvJV3VN8vTHvxx"
+
+# market pc vault
+[[test.validator.clone]]
+address = "4CknBkuczy4tUss7aEoCqV27Bt7oGMem8RtR1dvjkfpz"
+
+# out mint
+[[test.validator.clone]]
+address = "nLKhEUbWB3xx3Rr9DJDWGBEUraJY3mUyhgy3axYDqF3"
