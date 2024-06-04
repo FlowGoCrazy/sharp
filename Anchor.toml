@@ -27,6 +27,10 @@ upgradeable = false
 address = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"
 program = "programs/pump.so"
 
+[[test.genesis]]
+address = "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"
+program = "programs/raydium.so"
+
 [test.validator]
 bind_address = "0.0.0.0"
 url = "https://mainnet.helius-rpc.com/?api-key=4d612394-b5d0-46a2-b702-700ca9e1b0d5"
