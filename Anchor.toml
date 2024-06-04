@@ -114,11 +114,3 @@ address = "EDDz8NdF1rsQNysSjCtNbJpmTXPgBmvvrumptf3bqZw4"
 # associated bonding curve
 [[test.validator.clone]]
 address = "CkJFiP1t266KjsrnjY65M1PX3MpG5koia4tyoFNiVi5M"
-
-# # system program
-# [[test.validator.clone]]
-# address = "11111111111111111111111111111111"
-
-# # token program
-# [[test.validator.clone]]
-# address = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
